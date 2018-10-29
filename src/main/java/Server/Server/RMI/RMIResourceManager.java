@@ -26,6 +26,7 @@ public class RMIResourceManager extends ResourceManager
 		{
 			s_serverName = args[0];
 		}
+		if (args.length>1) port=Integer.parseInt(args[1]);
 
 		// Create the RMI server entry
 		try {

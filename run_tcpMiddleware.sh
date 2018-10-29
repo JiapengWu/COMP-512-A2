@@ -6,4 +6,4 @@
 # echo '  $4 - hostname of Rooms'
 
 
-java -cp ${JARPATH} main.java.Server.Server.RMI.TCPMiddleware TCPMiddleware $1 $2 $3 $4 $5
+java -cp ${JARPATH} main.java.Server.Server.RMI.RMIMiddleware RMIMiddleware $1 $2 $3 $4 $5

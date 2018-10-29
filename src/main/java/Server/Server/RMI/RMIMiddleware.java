@@ -28,14 +28,19 @@ public class RMIMiddleware implements IResourceManager {
 
   public static void main(String args[]) {
   	try{
-
-	    if (args.length == 4) {
-	      s_serverName = args[0];
-	    }
-	    else{
-	    	Trace.error("RMIMiddleWare:: Expect 4 arguments. $0: hostname of MiddleWare, $1-$3: hostname of servers");
+	    
+	    if (args.length<4 || args.length>6){
+	    	Trace.error("RMIMiddleWare:: 4 required + 2 optional arguments . $0: name of MiddleWare, $1-$3: hostname of servers, optional $4: middleware port, option $5: server port");
 	    	System.exit(1);
 	    }
+  		
+  		if (args.length >=5) {
+  			middleware_port = Integer.parseInt(args[4]);
+  	    }
+  	    if (args.length >=6) {
+  	    	server_port = Integer.parseInt(args[5]);
+  	    }
+  	    s_serverName = args[0];
 
 	    // Create a new Server object
 	    RMIMiddleware mw = new RMIMiddleware(s_serverName);
