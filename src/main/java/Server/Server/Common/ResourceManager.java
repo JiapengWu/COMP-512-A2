@@ -32,6 +32,46 @@ public class ResourceManager implements IResourceManager
 		m_name = p_name;
 	}
 
+
+	/*
+	Transaction related operations
+	*/
+	public void abort(int xid) throws DeadlockException
+	{
+		xCopies.remove(xid);
+		xWrites.remove(xid);
+		xDeletes.remove(xid);
+		lm.UnlockAll(xid);
+	}
+
+	public void commit(int xid) throws DeadlockException
+	{
+		// Apply writes (including deletes)
+		synchronized(m_data){
+			RMHashMap writes = xWrites.get(xid);
+			Set<String> keys = writes.keySet();
+			for(String key: keys) {
+				m_data.put(key, writes.get(key));
+			}
+			RMHashMap deletes = xDeletes.get(txnID);
+			keys = deletes.keySet();
+			for(String key: keys) {
+				m_itemHT.remove(key);
+			}
+		}
+		// empty history
+		xWrites.remove(xid);
+		xDeletes.remove(xid);
+		xCopies.remove(xid);
+	}
+
+	public void start(int xid) throws DeadlockException
+	{
+		xCopies.put(xid,m_data.deep_copy());
+		xWrites.put(xid, new RMHashMap());
+		xDeletes.put(xid, new RMHashMap());
+	}
+
 	// Reads a data item
 	protected RMItem readData(int xid, String key) throws DeadlockException
 	{
