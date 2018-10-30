@@ -9,6 +9,11 @@ import java.rmi.RemoteException;
 import java.util.Calendar;
 import java.util.Vector;
 
+
+import server.LockManager.DeadlockException;
+import server.LockManager.LockManager;
+import server.LockManager.TransactionLockObject;
+
 import main.java.Server.Server.Interface.IResourceManager;
 
 public class ResourceManager implements IResourceManager
@@ -16,17 +21,26 @@ public class ResourceManager implements IResourceManager
 	protected String m_name = "";
 	protected RMHashMap m_data = new RMHashMap();
 
+	protected LockManager lm = new LockManager();
+	// Transaction history record from start to commit, to handle abort
+	protected HashMap<Integer, RMHashMap> xCopies = new HashMap<Integer, RMHashMap>();
+    protected HashMap<Integer, RMHashMap> xWrites = new HashMap<Integer, RMHashMap>();
+    protected HashMap<Integer, RMHashMap> xDeletes = new HashMap<Integer, RMHashMap>();
+
 	public ResourceManager(String p_name)
 	{
 		m_name = p_name;
 	}
 
 	// Reads a data item
-	protected RMItem readData(int xid, String key)
+	protected RMItem readData(int xid, String key) throws DeadlockException
 	{
+		lm.Lock(xid, key, TransactionLockObject.LockType.LOCK_READ);
+		RMHashMap copy = xCopies.get(xid);
 		synchronized(m_data) {
 			RMItem item = m_data.get(key);
 			if (item != null) {
+				copy.put(key,item);
 				return (RMItem)item.clone();
 			}
 			return null;
@@ -36,16 +50,25 @@ public class ResourceManager implements IResourceManager
 	// Writes a data item
 	protected void writeData(int xid, String key, RMItem value)
 	{
-		synchronized(m_data) {
-			m_data.put(key, value);
+		lm.Lock(xid, key, TransactionLockObject.LockType.LOCK_WRITE);
+		RMHashMap copy = xCopies.get(xid);
+		synchronized(copy) {
+			copy.put(key, value);
+		}
+		RMHashMap writes = xWrites.get(xid);
+		synchronized(writes) {
+			writes.put(key,value);
 		}
 	}
 
 	// Remove the item out of storage
 	protected void removeData(int xid, String key)
 	{
-		synchronized(m_data) {
-			m_data.remove(key);
+		lm.Lock(xid, key, TransactionLockObject.LockType.LOCK_WRITE);
+		deletes = xDeletes.get(xid);
+		synchronized(delete) {
+			deletes.put(key,null)
+			copy.remove(key);
 		}
 	}
 
