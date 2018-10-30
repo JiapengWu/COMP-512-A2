@@ -1,6 +1,5 @@
 #!/bin/bash 
 
-#TODO: SPECIFY THE HOSTNAMES OF 4 CS MACHINES (lab1-1, cs-2, etc...)
 MACHINES=(cs-5 cs-6 cs-4 cs-9)
 
 server_port=1200

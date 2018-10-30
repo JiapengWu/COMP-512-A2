@@ -12,7 +12,7 @@ import main.java.Server.Server.Common.Trace;
 import main.java.Server.Server.Interface.IResourceManager;
 
 public class RMIMiddleware implements IResourceManager {
-  private static String s_serverName = "MiddleWare";
+  private static String mw_serverName = "MiddleWare";
   private static final String s_rmiPrefix = "group6_";
 
   private static IResourceManager flightRM;
@@ -40,10 +40,10 @@ public class RMIMiddleware implements IResourceManager {
   	    if (args.length >=6) {
   	    	server_port = Integer.parseInt(args[5]);
   	    }
-  	    s_serverName = args[0];
+  	    mw_serverName = args[0];
 
 	    // Create a new Server object
-	    RMIMiddleware mw = new RMIMiddleware(s_serverName);
+	    RMIMiddleware mw = new RMIMiddleware(mw_serverName);
 	    // Dynamically generate the stub (MiddleWare proxy)
 	    IResourceManager mw_RM = (IResourceManager) UnicastRemoteObject.exportObject(mw, middleware_port);
 
@@ -55,7 +55,7 @@ public class RMIMiddleware implements IResourceManager {
 
 	    }
 	    final Registry registry = client_registry;
-	    registry.rebind(s_rmiPrefix + s_serverName, mw_RM); //group6_MiddleWare
+	    registry.rebind(s_rmiPrefix + mw_serverName, mw_RM); //group6_MiddleWare
 
 	    try {
 	      getResourceManagers(args);
@@ -66,15 +66,15 @@ public class RMIMiddleware implements IResourceManager {
 	    Runtime.getRuntime().addShutdownHook(new Thread() {
 				public void run() {
 					try {
-						registry.unbind(s_rmiPrefix + s_serverName);
-						System.out.println("'" + s_serverName + "' MiddleWare unbound");
+						registry.unbind(s_rmiPrefix + mw_serverName);
+						System.out.println("'" + mw_serverName + "' MiddleWare unbound");
 					}
 					catch(Exception e) {
 						System.err.println((char)27 + "[31;1mServer exception: " + (char)27 + "[0mUncaught exception");
 					}
 				}
 			});
-			System.out.println("'" + s_serverName + "' Middleware server ready and bound to '" + s_rmiPrefix + s_serverName + "'" + "at port:"+String.valueOf(middleware_port));
+		System.out.println("'" + mw_serverName + "' Middleware server ready and bound to '" + s_rmiPrefix + mw_serverName + "'" + "at port:"+String.valueOf(middleware_port));
 	}
     catch (Exception e) {
 			System.err.println((char)27 + "[31;1mServer exception: " + (char)27 + "[0mUncaught exception");
@@ -91,18 +91,21 @@ public class RMIMiddleware implements IResourceManager {
   }
 
   public static void getResourceManagers(String args[]) throws Exception {
-
+	
+	  System.out.println(args[1] + String.valueOf(server_port));
     Registry flightRegistry = LocateRegistry.getRegistry(args[1], server_port);
     flightRM = (IResourceManager) flightRegistry.lookup(s_rmiPrefix + "Flights");
     if (flightRM == null)
       throw new AssertionError();
 
+    System.out.println(args[2] + String.valueOf(server_port));
     Registry carRegistry = LocateRegistry.getRegistry(args[2], server_port);
     carRM = (IResourceManager) carRegistry.lookup(s_rmiPrefix + "Cars");
     if (carRM == null)
       throw new AssertionError();
 
-   	Registry roomRegistry = LocateRegistry.getRegistry(args[3],server_port);
+    System.out.println(args[3] + String.valueOf(server_port));
+   	Registry roomRegistry = LocateRegistry.getRegistry(args[3], server_port);
     roomRM = (IResourceManager) roomRegistry.lookup(s_rmiPrefix + "Rooms");
     if (roomRM == null)
       throw new AssertionError();
