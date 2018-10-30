@@ -6,5 +6,5 @@
 # echo '  $4 - hostname of Rooms'
 # echo '  $5 - middleware port'
 # echo '  $6 - server port'
-rmiregistry -J-Djava.rmi.server.useCodebaseOnly=false $4 &
+rmiregistry -J-Djava.rmi.server.useCodebaseOnly=false 3099 &
 java -Djava.security.policy=server.policy -Djava.rmi.server.codebase=file:$(pwd)/src/main/java/Server/ -cp ${JARPATH} main.java.Server.Server.RMI.RMIMiddleware RMIMiddleware $1 $2 $3 $4 $5
