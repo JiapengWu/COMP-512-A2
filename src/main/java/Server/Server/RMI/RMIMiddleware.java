@@ -92,22 +92,16 @@ public class RMIMiddleware implements IResourceManager {
 
   public static void getResourceManagers(String args[]) throws Exception {
 	
-	System.out.println(args[1] + String.valueOf(server_port));
     Registry flightRegistry = LocateRegistry.getRegistry(args[1], server_port);
-    System.out.println(args[1] + String.valueOf(server_port));
     flightRM = (IResourceManager) flightRegistry.lookup(s_rmiPrefix + "Flights");
-    System.out.println(args[1] + String.valueOf(server_port));
-    
     if (flightRM == null)
       throw new AssertionError();
 
-    System.out.println(args[2] + String.valueOf(server_port));
     Registry carRegistry = LocateRegistry.getRegistry(args[2], server_port);
     carRM = (IResourceManager) carRegistry.lookup(s_rmiPrefix + "Cars");
     if (carRM == null)
       throw new AssertionError();
 
-    System.out.println(args[3] + String.valueOf(server_port));
    	Registry roomRegistry = LocateRegistry.getRegistry(args[3], server_port);
     roomRM = (IResourceManager) roomRegistry.lookup(s_rmiPrefix + "Rooms");
     if (roomRM == null)
