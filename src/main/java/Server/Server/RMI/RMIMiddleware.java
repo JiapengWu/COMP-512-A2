@@ -52,7 +52,6 @@ public class RMIMiddleware implements IResourceManager {
 	       client_registry = LocateRegistry.createRegistry(middleware_port);
 	    } catch (RemoteException e) {
 	       client_registry = LocateRegistry.getRegistry(middleware_port);
-
 	    }
 	    final Registry registry = client_registry;
 	    registry.rebind(s_rmiPrefix + mw_serverName, mw_RM); //group6_MiddleWare
