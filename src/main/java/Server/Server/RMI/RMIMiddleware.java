@@ -92,9 +92,10 @@ public class RMIMiddleware implements IResourceManager {
 
   public static void getResourceManagers(String args[]) throws Exception {
 	
-	  System.out.println(args[1] + String.valueOf(server_port));
+	System.out.println(args[1] + String.valueOf(server_port));
     Registry flightRegistry = LocateRegistry.getRegistry(args[1], server_port);
     flightRM = (IResourceManager) flightRegistry.lookup(s_rmiPrefix + "Flights");
+    
     if (flightRM == null)
       throw new AssertionError();
 
