@@ -11,7 +11,7 @@ public class RMIClient extends Client
 {
 	private static String s_serverHost = "localhost";
 	private static int s_serverPort = 3099;
-	private static String s_serverName = "Server";
+	private static String s_serverName = "MiddleWare";
 
 
 	//TODO: REPLACE 'ALEX' WITH YOUR GROUP NUMBER TO COMPILE
@@ -25,7 +25,7 @@ public class RMIClient extends Client
 		}
 		if (args.length > 1)
 		{
-			s_serverName = args[1];
+			s_serverPort = Integer.parseInt(args[1]);
 		}
 		if (args.length > 2)
 		{
