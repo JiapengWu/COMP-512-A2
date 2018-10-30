@@ -220,4 +220,16 @@ public interface IResourceManager extends Remote
     
     public void abort(int txnID) throws RemoteException;
 
+    /*
+    when bundle fails: undo reserve
+    */
+    public boolean unReserveFlight(int id, int customerID, int flightNumber) 
+    throws RemoteException,DeadlockException; 
+
+    public boolean unReserveCar(int id, int customerID, String location) 
+    throws RemoteException,DeadlockException; 
+
+    public boolean unReserveRoom(int id, int customerID, String location) 
+    throws RemoteException,DeadlockException; 
+
 }

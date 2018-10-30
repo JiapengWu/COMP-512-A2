@@ -27,6 +27,12 @@ public class Customer extends RMItem
 		return m_ID;
 	}
 
+	public void unReserve(String key, String location, int price)
+	{
+		// TODO: Implement this
+		
+	}
+
 	public void reserve(String key, String location, int price)
 	{
 		ReservedItem reservedItem = getReservedItem(key);

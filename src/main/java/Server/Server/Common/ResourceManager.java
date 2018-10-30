@@ -27,6 +27,8 @@ public class ResourceManager implements IResourceManager
     protected HashMap<Integer, RMHashMap> xWrites = new HashMap<Integer, RMHashMap>();
     protected HashMap<Integer, RMHashMap> xDeletes = new HashMap<Integer, RMHashMap>();
 
+
+
 	public ResourceManager(String p_name)
 	{
 		m_name = p_name;
@@ -166,6 +168,46 @@ public class ResourceManager implements IResourceManager
 		Trace.info("RM::queryPrice(" + xid + ", " + key + ") returns cost=$" + value);
 		return value;        
 	}
+
+	// unReserve an Item
+	protected boolean unReserveItem(int xid, int customerID, String key, String location)
+	{
+		Trace.info("RM::unReserveItem(" + xid + ", customer=" + customerID + ", " + key + ", " + location + ") called" );        
+		// Read customer object if it exists (and read lock it)
+		Customer customer = (Customer)readData(xid, Customer.getKey(customerID));
+		if (customer == null)
+		{
+			Trace.warn("RM::unReserveItem(" + xid + ", " + customerID + ", " + key + ", " + location + ")  failed--customer doesn't exist");
+			return false;
+		} 
+
+		// Check if the item is available
+		ReservableItem item = (ReservableItem)readData(xid, key);
+		if (item == null)
+		{
+			Trace.warn("RM::unReserveItem(" + xid + ", " + customerID + ", " + key + ", " + location + ") failed--item doesn't exist");
+			return false;
+		}
+		else if (item.getCount() == 0)
+		{
+			Trace.warn("RM::unReserveItem(" + xid + ", " + customerID + ", " + key + ", " + location + ") failed--No more items");
+			return false;
+		}
+		else
+		{            
+			customer.unReserve(key, location, item.getPrice());        
+			writeData(xid, customer.getKey(), customer);
+
+			// Increase the number of available items in the storage
+			item.setCount(item.getCount() + 1);
+			item.setReserved(item.getReserved() - 1);
+			writeData(xid, item.getKey(), item);
+
+			Trace.info("RM::unReserveItem(" + xid + ", " + customerID + ", " + key + ", " + location + ") succeeded");
+			return true;
+		} 
+	}
+
 
 	// Reserve an item
 	protected boolean reserveItem(int xid, int customerID, String key, String location)
@@ -434,6 +476,22 @@ public class ResourceManager implements IResourceManager
 	{
 		return reserveItem(xid, customerID, Room.getKey(location), location);
 	}
+
+
+	// undo reserve
+	public boolean unReserveFlight(int xid, int customerID, int flightNum) throws RemoteException{
+		return unReserveItem(xid, customerID, Flight.getKey(flightNum), String.valueOf(flightNum));
+	}
+
+	public boolean unReserveCar(int xid, int customerID, String location) throws RemoteException{
+		return unReserveItem(xid, customerID, Car.getKey(location), location);
+	}
+
+	public boolean unReserveRoom(int xid, int customerID, String location) throws RemoteException
+	{
+		return unReserveItem(xid, customerID, Room.getKey(location), location);
+	}
+
 
 	// Reserve bundle 
 	public boolean bundle(int xid, int customerId, Vector<String> flightNumbers, String location, boolean car, boolean room) throws RemoteException
